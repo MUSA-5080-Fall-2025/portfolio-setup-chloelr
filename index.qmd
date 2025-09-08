@@ -15,7 +15,7 @@ Advanced spatial analysis and data science for urban planning and public policy.
 - **Final Project:** Capstone modeling challenge
 
 ## About Me
-My name is Chloe Robinson, I'm a second year Master in City Planning student at the University of Pennsylvania. My concentration is Sustainable Transportation and Infrastructure Planning.
+My name is Chloe Robinson, I'm a second year Master in City Planning student at the University of Pennsylvania. My concentration is Sustainable Transportation and Infrastructure Planning
 
 ## Contact
 - Email: chloelr@upenn.edu

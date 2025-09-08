@@ -1,10 +1,10 @@
 ---
-title: "MUSA 5080 Portfolio"
+title: "Chloe Robinson - MUSA 5080 Portfolio"
 ---
 
 # Welcome to My Portfolio
 
-This portfolio documents my learning journey in Public Policy Analytics (MUSA 5080).
+This portfolio documents my learning journey in Public Policy Analytics (MUSA 5080)
 
 ## About This Course
 Advanced spatial analysis and data science for urban planning and public policy.
@@ -15,8 +15,9 @@ Advanced spatial analysis and data science for urban planning and public policy.
 - **Final Project:** Capstone modeling challenge
 
 ## About Me
-[Students will customize this section]
+My name is Chloe Robinson, I'm a second year Master in City Planning student at the University of Pennsylvania. My concentration is Sustainable Transportation and Infrastructure Planning.
 
 ## Contact
-- Email: [your.email@upenn.edu]
-- GitHub: [@your-username]
+- Email: chloelr@upenn.edu
+- GitHub: @chloelr
+

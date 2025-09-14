@@ -1,26 +1,26 @@
 {
-    "id": "4BB7E052",
+    "id": "FE645A9D",
     "path": "C:/Users/chloe.robinson/Desktop/PENN/FALL 2025/Public Policy Analytics/Week 1/portfolio-setup-chloelr/index.qmd",
     "project_path": "index.qmd",
     "type": "quarto_markdown",
-    "hash": "1560196686",
+    "hash": "2924310969",
     "contents": "",
     "dirty": false,
-    "created": 1757351047634.0,
+    "created": 1757890029470.0,
     "source_on_save": false,
-    "relative_order": 3,
+    "relative_order": 2,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "17,190",
+        "cursorPosition": "17,188",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1757351226,
+    "lastKnownWriteTime": 1757891086,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1757351226817,
+    "last_content_update": 1757891086062,
     "read_only": false,
     "read_only_alternatives": []
 }

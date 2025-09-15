@@ -8,7 +8,8 @@ date: "2025-09-08"
 - How to use GitHub desktop
 
 ## Coding Techniques
-- 'Render' command
+- 'Render' button to get preview of website 
+- Using the terminal to type 'quarto render'
 
 ## Questions & Challenges
 - I have never used GitHub before this class, so the main challenge has been trying to understand how it works and what is happening when I use it. 

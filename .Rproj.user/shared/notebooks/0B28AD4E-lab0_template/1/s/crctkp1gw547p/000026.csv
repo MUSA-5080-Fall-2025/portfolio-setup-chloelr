@@ -1,0 +1,11 @@
+"0","cars_model_mileage <- select(car_data, 'Model', 'Mileage')
+
+# Select Manufacturer, Price, and Fuel type
+cars_price_fuel <- select(car_data, 'Manufacturer', 'Price', 'Fuel type')
+
+# Challenge: Select all columns EXCEPT Engine Size
+cars_no_engine <- car_data %>% select(-'Engine size')
+```
+"
+"2","Error: attempt to use zero-length variable name
+"

@@ -1,0 +1,24 @@
+---
+title: "Week 2 Notes - Algorithmic Decision Making"
+editor: visual
+---
+
+## Key Concepts Learned
+- Algorithm = Set of rules or instructions for solving a problem or completing a task
+- Inputs =  Features, predictors, independent variables, x
+- Outputs = Labels, outcomes, dependent variables, y
+
+## Coding Techniques
+- Cleaning data names str_remove(), str_extract(), str_replace()
+- Getting ACS data from the Census Bureau in R studio using get_acs()
+
+## Connections to Policy
+- Algorithmic Fairness = Understanding how unreliable data can bias automated decisions
+- Resource Allocation = Understanding how some areas can be misrepresented using census data, and identifying which areas need extra attention and additional checks
+- Equity Analysis = Some communities may be systematically under-counted, usually small rural areas
+
+## Reflection
+- Very important to assess data quality
+- Margins of Error tend to be greater in smaller communities, leading to misclassification and wrong resource allocation 
+
+---

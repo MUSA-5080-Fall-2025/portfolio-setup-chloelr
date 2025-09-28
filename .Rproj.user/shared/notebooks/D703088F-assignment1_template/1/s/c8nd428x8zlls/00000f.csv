@@ -1,0 +1,30 @@
+"0","# Define your race/ethnicity variables with descriptive names
+tract_data <- get_acs(
+  geography = ""tract"",
+  variables = c(
+    white = ""B03002_003"",
+    black = ""B03002_004"",
+    hispanic = ""B03002_012"",
+    total_pop = ""B03002_001""
+  ),
+  state = my_state,
+  county = c(""061"", ""099""),
+  year = 2022,
+  survey = ""acs5"",
+  output = ""wide""
+)
+"
+"2","Getting data from the 2018-2022 5-year ACS
+"
+"2","Using FIPS code '36' for state 'New York'
+"
+"0","tract_data <- tract_data %>%"
+"0","  mutate("
+"0","    pct_white    = 100 * whiteE    / total_popE,"
+"0","    pct_black    = 100 * blackE    / total_popE,"
+"0","    pct_hispanic = 100 * hispanicE / total_popE"
+"0","  )"
+"0",""
+"0","tract_data <- tract_data %>%"
+"0","  separate(NAME, into = c(""tract_name"", ""county_name"", ""state_name""), sep = ""; "")"
+"0",""

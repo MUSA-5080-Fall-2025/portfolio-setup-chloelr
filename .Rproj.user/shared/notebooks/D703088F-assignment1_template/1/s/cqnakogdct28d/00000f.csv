@@ -1,0 +1,22 @@
+"0","high_uncertainty <- county_reliability %>%
+  arrange(desc(moe_percentage)) %>%
+  slice_head(n = 5) %>%
+  select(county_name, total_popE, median_incomeE, median_incomeM, moe_percentage, reliability)
+
+kable(
+  high_uncertainty,
+  col.names = c(""County"",""Total Population"",""Median Income (E)"",""Median Income MOE"",""MOE %"",""Reliability""),
+  caption = ""Counties with Highest Income Data Uncertainty"",
+  format.args = list(big.mark = "","")
+)
+"
+"2","Registered S3 methods overwritten by 'htmltools':
+  method               from         
+  print.html           tools:rstudio
+  print.shiny.tag      tools:rstudio
+  print.shiny.tag.list tools:rstudio
+"
+"2","Registered S3 method overwritten by 'rmarkdown':
+  method         from
+  print.paged_df     
+"

@@ -7,5 +7,17 @@
   },
   "weekly-notes/week-01-notes.qmd": {
     "week-01-notes.html": "aea93f4a"
+  },
+  "Labs/Lab0/Script/lab0_template.qmd": {
+    "lab0_template.html": "c66de1a9"
+  },
+  "Labs/Lab1/Script/assignment1_template.qmd": {
+    "assignment1_template.html": "efa337a1"
+  },
+  "docs/Labs/Lab1/Script/assignment1_template.qmd": {
+    "assignment1_template.html": "345f2c53"
+  },
+  "weekly-notes/week-02-notes.qmd": {
+    "week-02-notes.html": "1a2c6ff0"
   }
 }

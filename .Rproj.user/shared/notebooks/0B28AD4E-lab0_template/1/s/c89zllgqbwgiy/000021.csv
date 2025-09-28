@@ -1,0 +1,6 @@
+"0","car_data <- car_data %>% rename(car_data, year = `Year of manufacture')
+"
+"2","Error: unexpected symbol in:
+""
+car_data <- car_data %>% rename(car_data, year = `Year""
+"

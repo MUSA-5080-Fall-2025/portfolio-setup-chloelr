@@ -707,7 +707,6 @@ ggplot() +
   labs(
     title    = "Access to Libraries & Rec Centers (0.25-mile buffers)",
     subtitle = "Philadelphia census tracts",
-    caption  = "CRS: EPSG:3365 (feet). Sources: OpenDataPhilly, Free Library, ACS 2018–2022."
   ) +
   theme_void()
 
@@ -729,11 +728,13 @@ tract_access_crime_map <- tract_access_crime %>%
 ggplot() +
   geom_sf(data = tract_access_crime_map, aes(fill = category), color = NA) +
   geom_sf(data = resources, color = "black", size = 0.3, alpha = 0.5, show.legend = FALSE) +
-  labs(title = "Resource Access and Homicides in Philadelphia",
-       subtitle = paste0("Underserved ≤", access_thresh_pct, "% area within 0.25 mi; ",
-                         "High homicide ≥", homicide_thresh_100k, " per 100k"),
-       caption = "CRS: EPSG:3365 (feet).") +
-  theme_void() + theme(legend.position = "right")
+  labs(
+    title = "Resource Access and Homicides in Philadelphia",
+    subtitle = paste0("Underserved ≤", access_thresh_pct, "% area within 0.25 mi; ",
+                      "High homicide ≥", homicide_thresh_100k, " per 100k")
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
 
 ```
 

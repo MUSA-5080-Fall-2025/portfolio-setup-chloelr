@@ -1,0 +1,22 @@
+"0","ggplot(vuln_dist, aes(x = dist_mi)) +
+  geom_histogram(
+    breaks = brks, closed = ""left"",
+    aes(
+      weight = w65,
+      y = after_stat(count / sum(count))   # for ggplot2 ≥ 3.4
+      # if your ggplot2 is older, use: y = ..count.. / sum(..count..)
+    ),
+    color = ""white"", fill = ""#9ecae1""
+  ) +
+  geom_vline(xintercept = 15, linetype = ""dashed"") +
+  scale_y_continuous(labels = percent) +
+  labs(
+    title = ""Distance to Nearest Hospital — Population-Weighted (65+ in vulnerable tracts)"",
+    x = ""Distance to nearest hospital (miles)"",
+    y = ""Share of vulnerable 65+ residents""
+  ) +
+  theme_minimal()
+```
+"
+"2","Error: attempt to use zero-length variable name
+"

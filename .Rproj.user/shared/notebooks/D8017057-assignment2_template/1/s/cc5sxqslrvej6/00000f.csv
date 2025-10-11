@@ -1,0 +1,8 @@
+"0","# Load required packages
+library(sf)
+"
+"2","Warning:"
+"2"," package ‘sf’ was built under R version 4.4.3
+"
+"2","Linking to GEOS 3.13.0, GDAL 3.10.1, PROJ 9.5.1; sf_use_s2() is TRUE
+"

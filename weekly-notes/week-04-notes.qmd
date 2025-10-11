@@ -1,0 +1,49 @@
+---
+title: "Week 4 Notes - Spatial Data & GIS Operations in R"
+date: "2025-09-29"
+---
+
+
+## Key Concepts Learned
+- 
+- How to use GitHub desktop
+
+## Coding Techniques
+st_intersects()	- Any overlap at all	“Counties affected by flooding”
+st_touches()	- Share boundary, no interior overlap	“Neighboring counties”
+st_within()	- Completely inside	“Schools within district boundaries”
+st_contains()	- Completely contains	“Districts containing hospitals”
+st_overlaps()- 	Partial overlap	“Overlapping service areas”
+st_disjoint()	- No spatial relationship	“Counties separate from urban areas”
+
+## The Dot (.)
+The dot (.) is a placeholder that represents the data being passed through the pipe (%>%).
+pa_counties <- pa_counties %>% mutate( area_sqkm = as.numeric(st_area(.)) / 1000000 )
+
+- the (.) refers to pa_counties
+
+## Geographic Coordinates 
+- Longitude and Latitude
+Units: decimal degrees
+Good for: Global datasets, web mapping
+Bad for: Area/distance calculations
+- Example: WGS84
+
+## Projected Coordinates 
+X/Y coordinates on a flat plane
+Units: meters, feet, etc.
+Good for: Local analysis, accurate measurements
+Bad for: Large areas, global datasets
+
+
+
+## Questions & Challenges
+- I have never used GitHub before this class, so the main challenge has been trying to understand how it works and what is happening when I use it. 
+- Learning the different terms like repositories (folder containing my project files), commit (snapshot of my work at a point in time), push (Send changes made on R Studio to GitHub cloud), pull (Pull latest changes from Github cloud)
+
+## Connections to Policy
+- [How this week's content applies to real policy work]
+
+## Reflection
+- [What was most interesting]
+- [How I'll apply this knowledge]

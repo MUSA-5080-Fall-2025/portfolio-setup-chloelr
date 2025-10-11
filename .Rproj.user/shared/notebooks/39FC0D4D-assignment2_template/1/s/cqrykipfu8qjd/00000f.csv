@@ -24,13 +24,3 @@
 "0","kable(summary_table,"
 "0","      caption = ""Summary of Vulnerable and Underserved Census Tracts in Pennsylvania"","
 "0","      align = c(""l"", ""r""))"
-"2","Registered S3 methods overwritten by 'htmltools':
-  method               from         
-  print.html           tools:rstudio
-  print.shiny.tag      tools:rstudio
-  print.shiny.tag.list tools:rstudio
-"
-"2","Registered S3 method overwritten by 'rmarkdown':
-  method         from
-  print.paged_df     
-"

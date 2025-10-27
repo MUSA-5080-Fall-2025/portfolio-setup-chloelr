@@ -1,0 +1,6 @@
+"0",""
+"0","neighbor_points <- neighbor_points %>%"
+"0","  st_join(nhoods_prices, by = ""NAME"")"
+"0",""
+"0","# Still add neighbor points to OPA data"
+"0",""

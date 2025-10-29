@@ -23,7 +23,10 @@ website:
           - href: Labs/Lab2/Script/assignment2_template.qmd
             text: Lab 2
           - href: Labs/Midterm/MUSA-5080-Midterm/model_script.qmd
-
+            text: Midterm Technical Appendix
+          - href: Labs/Midterm/MUSA-5080-Midterm/midterm_presentation.html
+            text: Midterm Presentation
+          
 format:
   html:
     theme: cosmo

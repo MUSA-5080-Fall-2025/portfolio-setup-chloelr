@@ -598,8 +598,8 @@
     "objectID": "Labs/Midterm/MUSA-5080-Midterm/midterm_presentation.html#research-question-and-motivation",
     "href": "Labs/Midterm/MUSA-5080-Midterm/midterm_presentation.html#research-question-and-motivation",
     "title": "Philadelphia Housing Price Prediction",
-    "section": "",
-    "text": "Research Question\nIdentify which predictors (spatial, structural, and/or socio-economic) contribute to the most accurate model for the City’s Automated Valuation Model\n\nMotivation\nResidential property tax assessments have equitable and financial implications for homeowners as well as fiscal implications for the city"
+    "section": "Research Question and Motivation",
+    "text": "Research Question and Motivation\n\n\nResearch Question\nIdentify which predictors (spatial, structural, and/or socio-economic) contribute to the most accurate model for the City’s Automated Valuation Model\n\nMotivation\nResidential property tax assessments have equitable and financial implications for homeowners as well as fiscal implications for the city"
   },
   {
     "objectID": "Labs/Midterm/MUSA-5080-Midterm/midterm_presentation.html#data-sources",
@@ -669,6 +669,6 @@
     "href": "Labs/Midterm/MUSA-5080-Midterm/midterm_presentation.html#questions",
     "title": "Philadelphia Housing Price Prediction",
     "section": "Questions?",
-    "text": "Questions?\n\n\n\n\n\n\n\n\nThank you\n\n\n\n\nCode\n1 + 1\n\n\n[1] 2"
+    "text": "Questions?\n\n\n\n\n\n\n\n\nThank you\n\n\n\n[1] 2"
   }
 ]

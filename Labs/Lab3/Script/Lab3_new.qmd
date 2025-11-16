@@ -94,7 +94,6 @@ chicagoBoundary <-
 
 ```
 
-
 ## Exercise 1.2: Load Burglary Data
 
 ```{r load-burglaries, message=FALSE, warning=FALSE,  results='hide'}
@@ -238,7 +237,7 @@ After aggregating burglaries to the 500m × 500m fishnet grid, there was a clear
 
 Before building complex models, let's create a simple baseline using **Kernel Density Estimation (KDE)**.
 
-**The KDE baseline asks:** "What if crime just happens where it happened before?" 
+**The KDE baseline asks:** "What if crime just happens where it happened before?"
 
 ```{r kde-baseline}
 #| message: false
@@ -864,9 +863,9 @@ Overall, the model’s technical performance was moderate, as shown by its cross
 
 **Spatial Patterns:**
 
-Burglaries in Chicago are not spread out evenly across the city. Instead, they cluster in specific neighborhoods, especially in busy and densely populated areas. The West Side, the Near North and Near West, and parts of the South Side showed the highest concentrations of crime. These areas higher density than the areas with no clusters, with more residential, commercial and foot traffic. 
+Burglaries in Chicago are not spread out evenly across the city. Instead, they cluster in specific neighborhoods, especially in busy and densely populated areas. The West Side, the Near North and Near West, and parts of the South Side showed the highest concentrations of crime. These areas higher density than the areas with no clusters, with more residential, commercial and foot traffic.
 
-Model residuals were not spatially random, they showed systematic clustering. It consistently underestimated crime in neighborhoods where burglaries were common and overestimated crime in low-crime areas.This is because the model was missing important factors that contribute to how burglary occurs in space. Neighborhood dynamics, such as differences in how often residents report issues to 311, variations in housing density, levels of foot traffic, and other social or environmental conditions were not included in the model. Without these key factors, the model wasn’t able to fully capture the true spatial drivers of burglary, leading to prediction errors. This tell us that burglary is shaped by broader neighborhood conditions. 
+Model residuals were not spatially random, they showed systematic clustering. It consistently underestimated crime in neighborhoods where burglaries were common and overestimated crime in low-crime areas.This is because the model was missing important factors that contribute to how burglary occurs in space. Neighborhood dynamics, such as differences in how often residents report issues to 311, variations in housing density, levels of foot traffic, and other social or environmental conditions were not included in the model. Without these key factors, the model wasn’t able to fully capture the true spatial drivers of burglary, leading to prediction errors. This tell us that burglary is shaped by broader neighborhood conditions.
 
 **Model Limitations:**
 
@@ -883,5 +882,3 @@ When you combine all of these issues—extra variation in burglary counts, spati
 This analysis showed that burglaries in Chicago are highly clustered and that simple spatial smoothing (KDE) can outperform more complex regression models when important neighborhood factors are missing. The regression model struggled with over dispersion, uneven 311 reporting, and many zero-crime areas, all of which made prediction harder.
 
 Moving forward, the model could be improved by adding stronger spatial and social predictors, such as population density, land use, and neighborhood characteristics, and by using disorder measures that aren’t affected by reporting biases.
-
-::::::::::

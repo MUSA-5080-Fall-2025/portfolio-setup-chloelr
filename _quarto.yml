@@ -22,9 +22,9 @@ website:
             text: Lab 1
           - href: Labs/Lab2/Script/assignment2_template.qmd
             text: Lab 2
-          - href: Labs/Midterm/MUSA-5080-Midterm/model_script.qmd
+          - href: Labs/Midterm/model_script.qmd
             text: Midterm Technical Appendix
-          - href: Labs/Midterm/MUSA-5080-Midterm/midterm_presentation.qmd
+          - href: Labs/Midterm/midterm_presentation.qmd
             text: Midterm Presentation
           - href: Labs/Lab3/Script/Lab3_new.qmd
             text: Lab 3

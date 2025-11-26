@@ -838,5 +838,418 @@
     "title": "Week 2 Notes - Algorithmic Decision Making",
     "section": "Reflection",
     "text": "Reflection\n\nVery important to assess data quality\nMargins of Error tend to be greater in smaller communities, leading to misclassification and wrong resource allocation"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "",
+    "text": "Philadelphia’s Indego bike share system faces the same operational challenge as every bike share system: rebalancing bikes to meet anticipated demand.\nImagine you’re an Indego operations manager at 6:00 AM on a Monday morning. You have: - 200 stations across Philadelphia - Limited trucks and staff for moving bikes - 2-3 hours before morning rush hour demand peaks - The question: Which stations will run out of bikes by 8:30 AM?\nThis lab will teach you to build predictive models that forecast bike share demand across space (different stations) and time (different hours) to help solve this operational problem."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#the-rebalancing-challenge-in-philadelphia",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#the-rebalancing-challenge-in-philadelphia",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "",
+    "text": "Philadelphia’s Indego bike share system faces the same operational challenge as every bike share system: rebalancing bikes to meet anticipated demand.\nImagine you’re an Indego operations manager at 6:00 AM on a Monday morning. You have: - 200 stations across Philadelphia - Limited trucks and staff for moving bikes - 2-3 hours before morning rush hour demand peaks - The question: Which stations will run out of bikes by 8:30 AM?\nThis lab will teach you to build predictive models that forecast bike share demand across space (different stations) and time (different hours) to help solve this operational problem."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-indego-trip-data-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-indego-trip-data-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Load Indego Trip Data (Q1 2025)",
+    "text": "Load Indego Trip Data (Q1 2025)\n\n\n\nSummary of Indego Trip Data – Q1 2025\n\n\nTotal Trips\nDate Range Start\nDate Range End\nUnique Start Stations\n\n\n\n\n201588\n2025-01-01\n2025-03-31 23:48:00\n265"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-time-bins-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-time-bins-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Create Time Bins (Q1 2025)",
+    "text": "Create Time Bins (Q1 2025)\n\nindego_q1 &lt;- indego_q1 %&gt;%\n  mutate(\n    # Parse datetime\n    start_datetime = mdy_hm(start_time),\n    end_datetime   = mdy_hm(end_time),\n\n    # Create hourly bins\n    interval60 = floor_date(start_datetime, unit = \"hour\"),\n\n    # Extract time features\n    week  = week(interval60),\n    month = month(interval60, label = TRUE),\n    dotw  = wday(interval60, label = TRUE),\n    hour  = hour(interval60),\n    date  = as.Date(interval60),\n\n    # Create useful indicators\n    weekend   = ifelse(dotw %in% c(\"Sat\", \"Sun\"), 1, 0),\n    rush_hour = ifelse(hour %in% c(7, 8, 9, 16, 17, 18), 1, 0)\n  )\n\n\n\n\nPreview of temporal features – Q1 2025\n\n\nstart_datetime\ninterval60\nweek\ndotw\nhour\nweekend\n\n\n\n\n2025-01-01 00:00:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:04:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:05:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:05:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:08:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:14:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:14:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:18:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:18:00\n2025-01-01\n1\nWed\n0\n0\n\n\n2025-01-01 00:18:00\n2025-01-01\n1\nWed\n0\n0"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#trips-over-time-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#trips-over-time-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Trips Over Time (Q1 2025)",
+    "text": "Trips Over Time (Q1 2025)\n\n# Daily trip counts\ndaily_trips_q1 &lt;- indego_q1 %&gt;%\n  group_by(date) %&gt;%\n  summarize(trips = n())\n\nggplot(daily_trips_q1, aes(x = date, y = trips)) +\n  geom_line(color = \"#3182bd\", linewidth = 1) +\n  geom_smooth(se = FALSE, color = \"red\", linetype = \"dashed\") +\n  labs(\n    title = \"Indego Daily Ridership – Q1 2025\",\n    subtitle = \"Winter ridership patterns in Philadelphia\",\n    x = \"Date\",\n    y = \"Daily Trips\",\n    caption = \"Source: Indego bike share\"\n  ) +\n  plotTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#hourly-patterns-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#hourly-patterns-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Hourly Patterns (Q1 2025)",
+    "text": "Hourly Patterns (Q1 2025)\n\nhourly_patterns_q1 &lt;- indego_q1 %&gt;%\n  group_by(hour, weekend) %&gt;%\n  summarize(avg_trips = n() / n_distinct(date)) %&gt;%\n  mutate(day_type = ifelse(weekend == 1, \"Weekend\", \"Weekday\"))\n\nggplot(hourly_patterns_q1, aes(x = hour, y = avg_trips, color = day_type)) +\n  geom_line(linewidth = 1.2) +\n  scale_color_manual(values = c(\"Weekday\" = \"#08519c\", \"Weekend\" = \"#6baed6\")) +\n  labs(\n    title = \"Average Hourly Ridership Patterns – Q1 2025\",\n    subtitle = \"Weekday commute peaks vs. weekend leisure patterns\",\n    x = \"Hour of Day\",\n    y = \"Average Trips per Hour\",\n    color = \"Day Type\"\n  ) +\n  plotTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#top-stations-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#top-stations-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Top Stations (Q1 2025)",
+    "text": "Top Stations (Q1 2025)\n\ntop_stations_q1 &lt;- indego_q1 %&gt;%\n  count(start_station, start_lat, start_lon, name = \"trips\") %&gt;%\n  arrange(desc(trips)) %&gt;%\n  head(10)\n\n\n\n\nTop 10 Indego Stations by Trip Origins – Q1 2025\n\n\nstart_station\nstart_lat\nstart_lon\ntrips\n\n\n\n\n3,010\n39.94711\n-75.16618\n3,999\n\n\n3,032\n39.94527\n-75.17971\n2,842\n\n\n3,359\n39.94888\n-75.16978\n2,699\n\n\n3,020\n39.94855\n-75.19007\n2,673\n\n\n3,208\n39.95048\n-75.19324\n2,503\n\n\n3,244\n39.93865\n-75.16674\n2,486\n\n\n3,066\n39.94561\n-75.17348\n2,396\n\n\n3,362\n39.94816\n-75.16226\n2,387\n\n\n3,012\n39.94218\n-75.17747\n2,361\n\n\n3,028\n39.94061\n-75.14958\n2,348"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-philadelphia-census-dataq1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-philadelphia-census-dataq1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Load Philadelphia Census Data(Q1 2025)",
+    "text": "Load Philadelphia Census Data(Q1 2025)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#map-philadelphia-context-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#map-philadelphia-context-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Map Philadelphia Context (Q1 2025)",
+    "text": "Map Philadelphia Context (Q1 2025)\n\nggplot() +\n  geom_sf(data = philly_census_q1, aes(fill = Med_Inc), color = NA) +\n  scale_fill_viridis(\n    option = \"viridis\",\n    name = \"Median\\nIncome\",\n    labels = scales::dollar\n  ) +\n  labs(\n    title = \"Philadelphia Median Household Income by Census Tract (Q1 2025)\",\n    subtitle = \"Context for bike share demand\"\n  ) +\n  geom_point(\n    data = indego_q1,\n    aes(x = start_lon, y = start_lat),\n    color = \"red\", size = 0.25, alpha = 0.6\n  ) +\n  mapTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-census-data-to-stations",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-census-data-to-stations",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Join Census Data to Stations",
+    "text": "Join Census Data to Stations\n\nstations_sf_q1 &lt;- indego_q1 %&gt;%\n  distinct(start_station, start_lat, start_lon) %&gt;%\n  filter(!is.na(start_lat), !is.na(start_lon)) %&gt;%\n  st_as_sf(coords = c(\"start_lon\", \"start_lat\"), crs = 4326)\n\nstations_census_q1 &lt;- st_join(stations_sf_q1, philly_census_q1, left = TRUE) %&gt;%\n  st_drop_geometry()\n\nstations_for_map_q1 &lt;- indego_q1 %&gt;%\n  distinct(start_station, start_lat, start_lon) %&gt;%\n  filter(!is.na(start_lat), !is.na(start_lon)) %&gt;%\n  left_join(\n    stations_census_q1 %&gt;% select(start_station, Med_Inc),\n    by = \"start_station\"\n  ) %&gt;%\n  mutate(has_census = !is.na(Med_Inc))\n\nindego_census_q1 &lt;- indego_q1 %&gt;%\n  left_join(\n    stations_census_q1 %&gt;% \n      select(start_station, Med_Inc, Percent_Taking_Transit, Percent_White, Total_Pop),\n      by = \"start_station\"\n  )\n\n\n\n\n\n\n\n\n\n\n\nvalid_stations_q1 &lt;- stations_census_q1 %&gt;%\n  filter(!is.na(Med_Inc)) %&gt;%\n  pull(start_station)\n\nindego_census_q1 &lt;- indego_q1 %&gt;%\n  filter(start_station %in% valid_stations_q1) %&gt;%\n  left_join(\n    stations_census_q1 %&gt;% \n      select(start_station, Med_Inc, Percent_Taking_Transit, \n             Percent_White, Total_Pop),\n    by = \"start_station\"\n  )"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#get-weather-data-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#get-weather-data-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Get Weather Data (Q1 2025)",
+    "text": "Get Weather Data (Q1 2025)\n\nweather_data_q1 &lt;- riem_measures(\n  station    = \"PHL\",\n  date_start = \"2025-01-01\",\n  date_end   = \"2025-03-31\"\n)\n\nweather_processed_q1 &lt;- weather_data_q1 %&gt;%\n  mutate(\n    interval60    = floor_date(valid, unit = \"hour\"),\n    Temperature   = tmpf,\n    Precipitation = ifelse(is.na(p01i), 0, p01i),\n    Wind_Speed    = sknt\n  ) %&gt;%\n  select(interval60, Temperature, Precipitation, Wind_Speed) %&gt;%\n  distinct()\n\nweather_complete_q1 &lt;- weather_processed_q1 %&gt;%\n  complete(interval60 = seq(min(interval60), max(interval60), by = \"hour\")) %&gt;%\n  fill(Temperature, Precipitation, Wind_Speed, .direction = \"down\")"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-weather-patterns-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-weather-patterns-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Visualize Weather Patterns (Q1 2025)",
+    "text": "Visualize Weather Patterns (Q1 2025)\n\nggplot(weather_complete_q1, aes(x = interval60, y = Temperature)) +\n  geom_line(color = \"#3182bd\", alpha = 0.7) +\n  geom_smooth(se = FALSE, color = \"red\") +\n  labs(\n    title = \"Philadelphia Temperature – Q1 2025\",\n    subtitle = \"Winter conditions\",\n    x = \"Date\",\n    y = \"Temperature (°F)\"\n  ) +\n  plotTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#aggregate-trips-to-station-hour-level-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#aggregate-trips-to-station-hour-level-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Aggregate Trips to Station-Hour Level (Q1 2025)",
+    "text": "Aggregate Trips to Station-Hour Level (Q1 2025)\n\ntrips_panel_q1 &lt;- indego_census_q1 %&gt;%\n  group_by(interval60, start_station, start_lat, start_lon,\n           Med_Inc, Percent_Taking_Transit, Percent_White, Total_Pop) %&gt;%\n  summarize(Trip_Count = n()) %&gt;%\n  ungroup()"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-complete-panel-structure-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-complete-panel-structure-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Create Complete Panel Structure (Q1 2025)",
+    "text": "Create Complete Panel Structure (Q1 2025)\n\nn_stations_q1 &lt;- length(unique(trips_panel_q1$start_station))\nn_hours_q1    &lt;- length(unique(trips_panel_q1$interval60))\nexpected_rows_q1 &lt;- n_stations_q1 * n_hours_q1\n\nstudy_panel_q1 &lt;- expand.grid(\n  interval60   = unique(trips_panel_q1$interval60),\n  start_station = unique(trips_panel_q1$start_station)\n) %&gt;%\n  left_join(trips_panel_q1, by = c(\"interval60\", \"start_station\")) %&gt;%\n  mutate(Trip_Count = replace_na(Trip_Count, 0))\n\nstation_attributes_q1 &lt;- trips_panel_q1 %&gt;%\n  group_by(start_station) %&gt;%\n  summarize(\n    start_lat = first(start_lat),\n    start_lon = first(start_lon),\n    Med_Inc   = first(Med_Inc),\n    Percent_Taking_Transit = first(Percent_Taking_Transit),\n    Percent_White = first(Percent_White),\n    Total_Pop = first(Total_Pop)\n  )\n\nstudy_panel_q1 &lt;- study_panel_q1 %&gt;%\n  left_join(station_attributes_q1, by = \"start_station\")"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#add-time-features-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#add-time-features-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Add Time Features (Q1 2025)",
+    "text": "Add Time Features (Q1 2025)\n\nstudy_panel_q1 &lt;- study_panel_q1 %&gt;%\n  mutate(\n    week     = week(interval60),\n    month    = month(interval60, label = TRUE),\n    dotw     = wday(interval60, label = TRUE),\n    hour     = hour(interval60),\n    date     = as.Date(interval60),\n    weekend  = ifelse(dotw %in% c(\"Sat\", \"Sun\"), 1, 0),\n    rush_hour = ifelse(hour %in% c(7, 8, 9, 16, 17, 18), 1, 0)\n  )"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-weather-data-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-weather-data-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Join Weather Data (Q1 2025)",
+    "text": "Join Weather Data (Q1 2025)\n\nstudy_panel_q1 &lt;- study_panel_q1 %&gt;%\n  left_join(weather_complete_q1, by = \"interval60\")\n\n#Create Temporal Lag Variables (Q1 2025)\n\nstudy_panel_q1 &lt;- study_panel_q1 %&gt;%\n  arrange(start_station, interval60)\n\nstudy_panel_q1 &lt;- study_panel_q1 %&gt;%\n  group_by(start_station) %&gt;%\n  mutate(\n    lag1Hour   = lag(Trip_Count, 1),\n    lag2Hours  = lag(Trip_Count, 2),\n    lag3Hours  = lag(Trip_Count, 3),\n    lag12Hours = lag(Trip_Count, 12),\n    lag1day    = lag(Trip_Count, 24)\n  ) %&gt;%\n  ungroup()\n\nstudy_panel_complete_q1 &lt;- study_panel_q1 %&gt;%\n  filter(!is.na(lag1day))\n\nstudy_panel_complete_q1 &lt;- study_panel_complete_q1 %&gt;%\n  mutate(\n    month = factor(month, levels = c(\"Jan\", \"Feb\", \"Mar\")),\n    dotw  = factor(dotw,  levels = c(\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"))\n  )\n\n\nexample_station_q1 &lt;- study_panel_complete_q1 %&gt;%\n  filter(start_station == first(start_station)) %&gt;%\n  head(168)\n\nggplot(example_station_q1, aes(x = interval60)) +\n  geom_line(aes(y = Trip_Count, color = \"Current\"), linewidth = 1) +\n  geom_line(aes(y = lag1Hour, color = \"1 Hour Ago\"), linewidth = 1, alpha = 0.7) +\n  geom_line(aes(y = lag1day, color = \"24 Hours Ago\"), linewidth = 1, alpha = 0.7) +\n  scale_color_manual(values = c(\n    \"Current\"     = \"#08519c\",\n    \"1 Hour Ago\"  = \"#3182bd\",\n    \"24 Hours Ago\"= \"#6baed6\"\n  )) +\n  labs(\n    title  = \"Temporal Lag Patterns at One Station – Q1 2025\",\n    x      = \"Date-Time\",\n    y      = \"Trip Count\",\n    color  = \"Time Period\"\n  ) +\n  plotTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-traintest-split-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-traintest-split-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Temporal Train/Test Split (Q1 2025)",
+    "text": "Temporal Train/Test Split (Q1 2025)\n\ntrain_weeks_q1 &lt;- 1:9\ntest_weeks_q1  &lt;- 10:13\n\nearly_stations_q1 &lt;- study_panel_complete_q1 %&gt;%\n  filter(week %in% train_weeks_q1, Trip_Count &gt; 0) %&gt;%\n  distinct(start_station) %&gt;%\n  pull(start_station)\n\nlate_stations_q1 &lt;- study_panel_complete_q1 %&gt;%\n  filter(week %in% test_weeks_q1, Trip_Count &gt; 0) %&gt;%\n  distinct(start_station) %&gt;%\n  pull(start_station)\n\ncommon_stations_q1 &lt;- intersect(early_stations_q1, late_stations_q1)\n\nstudy_panel_q1_ts &lt;- study_panel_complete_q1 %&gt;%\n  filter(start_station %in% common_stations_q1)\n\ntrain_q1 &lt;- study_panel_q1_ts %&gt;%\n  filter(week %in% train_weeks_q1)\n\ntest_q1 &lt;- study_panel_q1_ts %&gt;%\n  filter(week %in% test_weeks_q1)\n\n\n\n\nTrain/Test Summary – Q1 2025\n\n\nSet\nObservations\nDate_Range\n\n\n\n\nTraining (Q1 2025)\n428400\n2025-01-01 to 2025-03-04\n\n\nTesting (Q1 2025)\n189210\n2025-03-05 to 2025-03-31"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-1-baseline-time-weather-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-1-baseline-time-weather-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 1: Baseline (Time + Weather) — Q1 2025",
+    "text": "Model 1: Baseline (Time + Weather) — Q1 2025\n\ntrain_q1 &lt;- train_q1 %&gt;%\n  mutate(dotw_simple = factor(dotw, \n                              levels = c(\"Mon\",\"Tue\",\"Wed\",\"Thu\",\"Fri\",\"Sat\",\"Sun\")))\n\ncontrasts(train_q1$dotw_simple) &lt;- contr.treatment(7)\n\nmodel1_q1 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple +\n    Temperature + Precipitation,\n  data = train_q1\n)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-2-add-temporal-lags-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-2-add-temporal-lags-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 2: Add Temporal Lags — Q1 2025",
+    "text": "Model 2: Add Temporal Lags — Q1 2025\n\nmodel2_q1 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple +\n    Temperature + Precipitation +\n    lag1Hour + lag3Hours + lag1day,\n  data = train_q1\n)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-3-add-demographics-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-3-add-demographics-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 3: Add Demographics — Q1 2025",
+    "text": "Model 3: Add Demographics — Q1 2025\n\nmodel3_q1 &lt;- lm(\n  Trip_Count ~ \n    as.factor(hour) +\n    dotw_simple +\n    Temperature +\n    Precipitation +\n    lag1Hour +\n    lag3Hours +\n    lag1day +\n    Med_Inc.x +\n    Percent_Taking_Transit.x +\n    Percent_White.x,\n  data = train_q1\n)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-4-add-station-fixed-effects-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-4-add-station-fixed-effects-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 4: Add Station Fixed Effects — Q1 2025",
+    "text": "Model 4: Add Station Fixed Effects — Q1 2025\n\nmodel4_q1 &lt;- lm(\n  Trip_Count ~ \n    as.factor(hour) +\n    dotw_simple +\n    Temperature +\n    Precipitation +\n    lag1Hour +\n    lag3Hours +\n    lag1day +\n    Med_Inc.x +\n    Percent_Taking_Transit.x +\n    Percent_White.x +\n    as.factor(start_station),\n  data = train_q1\n)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-5-add-rush-hour-interaction-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-5-add-rush-hour-interaction-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 5: Add Rush Hour Interaction — Q1 2025",
+    "text": "Model 5: Add Rush Hour Interaction — Q1 2025\n\ntrain_q1$month &lt;- factor(train_q1$month, levels = c(\"Jan\",\"Feb\",\"Mar\"))\ntest_q1$month  &lt;- factor(test_q1$month, levels = levels(train_q1$month))\n\nmodel5_q1 &lt;- lm(\n  Trip_Count ~ \n    as.factor(hour) +\n    dotw_simple +\n    Temperature +\n    Precipitation +\n    lag1Hour +\n    lag3Hours +\n    lag1day +\n    rush_hour +\n    month +\n    Med_Inc.x +\n    Percent_Taking_Transit.x +\n    Percent_White.x +\n    as.factor(start_station) +\n    rush_hour * weekend,\n  data = train_q1\n)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#calculate-predictions-and-mae-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#calculate-predictions-and-mae-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Calculate Predictions and MAE — Q1 2025",
+    "text": "Calculate Predictions and MAE — Q1 2025\n\ntest_q1$month &lt;- factor(test_q1$month, levels = model5_q1$xlevels$month)\n\ntest_q1 &lt;- test_q1 %&gt;%\n  mutate(dotw_simple = factor(dotw,\n                              levels = c(\"Mon\",\"Tue\",\"Wed\",\"Thu\",\"Fri\",\"Sat\",\"Sun\")))\n\ncontrasts(test_q1$dotw_simple) &lt;- contr.treatment(7)\n\ntest_q1 &lt;- test_q1 %&gt;%\n  mutate(\n    pred1_q1 = predict(model1_q1, newdata = test_q1),\n    pred2_q1 = predict(model2_q1, newdata = test_q1),\n    pred3_q1 = predict(model3_q1, newdata = test_q1),\n    pred4_q1 = predict(model4_q1, newdata = test_q1),\n    pred5_q1 = predict(model5_q1, newdata = test_q1)\n  )\n\nmae_results_q1 &lt;- tibble(\n  Model = c(\n    \"1. Time + Weather\",\n    \"2. + Temporal Lags\",\n    \"3. + Demographics\",\n    \"4. + Station FE\",\n    \"5. + Rush Hour Interaction\"\n  ),\n  MAE = c(\n    mean(abs(test_q1$Trip_Count - test_q1$pred1_q1), na.rm = TRUE),\n    mean(abs(test_q1$Trip_Count - test_q1$pred2_q1), na.rm = TRUE),\n    mean(abs(test_q1$Trip_Count - test_q1$pred3_q1), na.rm = TRUE),\n    mean(abs(test_q1$Trip_Count - test_q1$pred4_q1), na.rm = TRUE),\n    mean(abs(test_q1$Trip_Count - test_q1$pred5_q1), na.rm = TRUE)\n  )\n)\n\nkable(mae_results_q1,\n      digits = 2,\n      caption = \"Mean Absolute Error by Model (Q1 2025 Test Set)\",\n      col.names = c(\"Model\", \"MAE (trips)\")) %&gt;%\n  kable_styling(bootstrap_options = c(\"striped\",\"hover\"))\n\n\nMean Absolute Error by Model (Q1 2025 Test Set)\n\n\nModel\nMAE (trips)\n\n\n\n\n1. Time + Weather\n0.60\n\n\n2. + Temporal Lags\n0.50\n\n\n3. + Demographics\n0.74\n\n\n4. + Station FE\n0.73\n\n\n5. + Rush Hour Interaction\n0.73"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-model-comparison-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-model-comparison-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Visualize Model Comparison — Q1 2025",
+    "text": "Visualize Model Comparison — Q1 2025\n\nggplot(mae_results_q1, aes(x = reorder(Model, -MAE), y = MAE)) +\n  geom_col(fill = \"#3182bd\", alpha = 0.8) +\n  geom_text(aes(label = round(MAE, 2)), vjust = -0.5) +\n  labs(\n    title = \"Model Performance Comparison — Q1 2025\",\n    subtitle = \"Lower MAE = Better Predictions\",\n    x = \"Model\",\n    y = \"Mean Absolute Error (trips)\"\n  ) +\n  plotTheme +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#observed-vs.-predicted-q1-2025-using-model-2",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#observed-vs.-predicted-q1-2025-using-model-2",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Observed vs. Predicted — Q1 2025 (Using Model 2)",
+    "text": "Observed vs. Predicted — Q1 2025 (Using Model 2)\n\ntest_q1 &lt;- test_q1 %&gt;%\n  mutate(\n    error_q1     = Trip_Count - pred2_q1,\n    abs_error_q1 = abs(error_q1),\n    time_of_day_q1 = case_when(\n      hour &lt; 7                  ~ \"Overnight\",\n      hour &gt;= 7 & hour &lt; 10     ~ \"AM Rush\",\n      hour &gt;= 10 & hour &lt; 15    ~ \"Mid-Day\",\n      hour &gt;= 15 & hour &lt;= 18   ~ \"PM Rush\",\n      hour &gt; 18                 ~ \"Evening\"\n    )\n  )\n\nggplot(test_q1, aes(x = Trip_Count, y = pred2_q1)) +\n  geom_point(alpha = 0.2, color = \"#3182bd\") +\n  geom_abline(slope = 1, intercept = 0, color = \"red\", linewidth = 1) +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"darkgreen\") +\n  facet_grid(weekend ~ time_of_day_q1) +\n  labs(\n    title = \"Observed vs. Predicted Trips — Q1 2025\",\n    x = \"Observed Trips\",\n    y = \"Predicted Trips\"\n  ) +\n  plotTheme\n\n\n\n\n\n\n\n\n##Spatial Error Patterns — Q1 2025\n\nstation_errors_q1 &lt;- test_q1 %&gt;%\n  group_by(start_station, start_lat.x, start_lon.x) %&gt;%\n  summarize(\n    MAE_q1         = mean(abs_error_q1, na.rm = TRUE),\n    avg_demand_q1  = mean(Trip_Count, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  filter(!is.na(start_lat.x), !is.na(start_lon.x))\n\np1_q1 &lt;- ggplot() +\n  geom_sf(data = philly_census_q1, fill = \"grey95\", color = \"white\", size = 0.2) +\n  geom_point(\n    data = station_errors_q1,\n    aes(x = start_lon.x, y = start_lat.x, color = MAE_q1),\n    size = 3.5,\n    alpha = 0.7\n  ) +\n  scale_color_viridis(\n    option = \"plasma\",\n    name = \"MAE (trips)\",\n    direction = -1\n  ) +\n  labs(title = \"Prediction Errors — Q1 2025\") +\n  mapTheme +\n  theme(legend.position = \"bottom\")\n\np2_q1 &lt;- ggplot() +\n  geom_sf(data = philly_census_q1, fill = \"grey95\", color = \"white\", size = 0.2) +\n  geom_point(\n    data = station_errors_q1,\n    aes(x = start_lon.x, y = start_lat.x, color = avg_demand_q1),\n    size = 3.5,\n    alpha = 0.7\n  ) +\n  scale_color_viridis(\n    option = \"viridis\",\n    name = \"Avg Demand (trips/hr)\",\n    direction = -1\n  ) +\n  labs(title = \"Average Demand — Q1 2025\") +\n  mapTheme +\n  theme(legend.position = \"bottom\")\n\ngrid.arrange(p1_q1, p2_q1, ncol = 2)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-error-patterns-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-error-patterns-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Temporal Error Patterns — Q1 2025",
+    "text": "Temporal Error Patterns — Q1 2025\n\ntemporal_errors_q1 &lt;- test_q1 %&gt;%\n  group_by(time_of_day_q1, weekend) %&gt;%\n  summarize(\n    MAE_q1 = mean(abs_error_q1, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  mutate(day_type_q1 = ifelse(weekend == 1, \"Weekend\", \"Weekday\"))\n\nggplot(temporal_errors_q1, aes(x = time_of_day_q1, y = MAE_q1, fill = day_type_q1)) +\n  geom_col(position = \"dodge\") +\n  scale_fill_manual(values = c(\"Weekday\" = \"#08519c\", \"Weekend\" = \"#6baed6\")) +\n  labs(\n    title = \"Prediction Errors by Time of Day — Q1 2025\",\n    x = \"Time of Day\",\n    y = \"Mean Absolute Error (trips)\"\n  ) +\n  plotTheme +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#errors-vs.-demographics-q1-2025",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#errors-vs.-demographics-q1-2025",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Errors vs. Demographics — Q1 2025",
+    "text": "Errors vs. Demographics — Q1 2025\n\nstation_errors_demo_q1 &lt;- station_errors_q1 %&gt;%\n  left_join(\n    station_attributes_q1 %&gt;%\n      select(start_station, Med_Inc, Percent_Taking_Transit, Percent_White),\n    by = \"start_station\"\n  ) %&gt;%\n  filter(!is.na(Med_Inc))\n\np1_q1 &lt;- ggplot(station_errors_demo_q1, aes(x = Med_Inc, y = MAE_q1)) +\n  geom_point(alpha = 0.5, color = \"#3182bd\") +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\") +\n  scale_x_continuous(labels = scales::dollar) +\n  labs(x = \"Median Income\", y = \"MAE\") +\n  plotTheme\n\np2_q1 &lt;- ggplot(station_errors_demo_q1, aes(x = Percent_Taking_Transit, y = MAE_q1)) +\n  geom_point(alpha = 0.5, color = \"#3182bd\") +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\") +\n  labs(x = \"% Taking Transit\", y = \"MAE\") +\n  plotTheme\n\np3_q1 &lt;- ggplot(station_errors_demo_q1, aes(x = Percent_White, y = MAE_q1)) +\n  geom_point(alpha = 0.5, color = \"#3182bd\") +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\") +\n  labs(x = \"% White\", y = \"MAE\") +\n  plotTheme\n\ngrid.arrange(p1_q1, p2_q1, p3_q1, ncol = 2)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-indego-trip-data-q2-2024",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-indego-trip-data-q2-2024",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Load Indego Trip Data (Q2 2024)",
+    "text": "Load Indego Trip Data (Q2 2024)\n\n\n\nSummary of Indego Trip Data\n\n\nTotal Trips\nDate Range Start\nDate Range End\nUnique Start Stations\n\n\n\n\n368091\n2024-04-01\n2024-06-30 23:56:00\n255"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-time-bins",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-time-bins",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Create Time Bins",
+    "text": "Create Time Bins\nWe need to aggregate trips into hourly intervals for our panel data structure.\n\nindego &lt;- indego %&gt;%\n  mutate(\n    # Parse datetime\n    start_datetime = mdy_hm(start_time),\n    end_datetime = mdy_hm(end_time),\n    \n    # Create hourly bins\n    interval60 = floor_date(start_datetime, unit = \"hour\"),\n    \n    # Extract time features\n    week = week(interval60),\n    month = month(interval60, label = TRUE),\n    dotw = wday(interval60, label = TRUE),\n    hour = hour(interval60),\n    date = as.Date(interval60),\n    \n    # Create useful indicators\n    weekend = ifelse(dotw %in% c(\"Sat\", \"Sun\"), 1, 0),\n    rush_hour = ifelse(hour %in% c(7, 8, 9, 16, 17, 18), 1, 0)\n  )\n\n\n\n\nPreview of temporal features\n\n\nstart_datetime\ninterval60\nweek\ndotw\nhour\nweekend\n\n\n\n\n2024-04-01 00:00:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:03:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:04:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:04:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:06:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:07:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:08:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:09:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:16:00\n2024-04-01\n14\nMon\n0\n0\n\n\n2024-04-01 00:24:00\n2024-04-01\n14\nMon\n0\n0"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#trips-over-time",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#trips-over-time",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Trips Over Time",
+    "text": "Trips Over Time\n\n# Daily trip counts\ndaily_trips &lt;- indego %&gt;%\n  group_by(date) %&gt;%\n  summarize(trips = n())\n\nggplot(daily_trips, aes(x = date, y = trips)) +\n  geom_line(color = \"#3182bd\", linewidth = 1) +\n  geom_smooth(se = FALSE, color = \"red\", linetype = \"dashed\") +\n  labs(\n    title = \"Indego Daily Ridership - Q2 2024\",\n    subtitle = \"Spring Demand Paters in Philadelphia\",\n    x = \"Date\",\n    y = \"Daily Trips\",\n    caption = \"Source: Indego bike share\"\n  ) +\n  plotTheme\n\n\n\n\n\n\n\n\nIndego ridership increases at a steady pace from April through June, showing a clear upward seasonal trend as the weather improves. Although overall ridership rises over time, there are occasional dips and highs that likely reflect bad weather or special events in Philadelphia."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#hourly-patterns",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#hourly-patterns",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Hourly Patterns",
+    "text": "Hourly Patterns\n\n# Average trips by hour and day type\nhourly_patterns &lt;- indego %&gt;%\n  group_by(hour, weekend) %&gt;%\n  summarize(avg_trips = n() / n_distinct(date)) %&gt;%\n  mutate(day_type = ifelse(weekend == 1, \"Weekend\", \"Weekday\"))\n\nggplot(hourly_patterns, aes(x = hour, y = avg_trips, color = day_type)) +\n  geom_line(linewidth = 1.2) +\n  scale_color_manual(values = c(\"Weekday\" = \"#08519c\", \"Weekend\" = \"#6baed6\")) +\n  labs(\n    title = \"Average Hourly Ridership Patterns\",\n    subtitle = \"Clear commute patterns on weekdays\",\n    x = \"Hour of Day\",\n    y = \"Average Trips per Hour\",\n    color = \"Day Type\"\n  ) +\n  plotTheme\n\n\n\n\n\n\n\n\nThe chart shows a strong correlation between commuting times and ridership during the weekday. There is a clear spike during the morning commute time during the week at 9am, and an even higher spike in ridership during the evening peak commute time, around 5-6pm. In contrast, the weekend pattern does not show sharp ridership peaks, instead has a steady ridership rises later in the morning, stays spread out across the afternoon, and begins to decline at 3pm."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#top-stations",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#top-stations",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Top Stations",
+    "text": "Top Stations\n\n# Most popular origin stations\ntop_stations &lt;- indego %&gt;%\n  count(start_station, start_lat, start_lon, name = \"trips\") %&gt;%\n  arrange(desc(trips)) %&gt;%\n  head(10)\n\n\n\n\nTop 10 Indego Stations by Trip Origins\n\n\nstart_station\nstart_lat\nstart_lon\ntrips\n\n\n\n\n3,010\n39.94711\n-75.16618\n6,115\n\n\n3,032\n39.94527\n-75.17971\n5,231\n\n\n3,295\n39.95028\n-75.16027\n4,451\n\n\n3,359\n39.94888\n-75.16978\n4,248\n\n\n3,022\n39.95472\n-75.18323\n4,070\n\n\n3,028\n39.94061\n-75.14958\n4,052\n\n\n3,066\n39.94561\n-75.17348\n4,047\n\n\n3,054\n39.96250\n-75.17420\n3,847\n\n\n3,020\n39.94855\n-75.19007\n3,792\n\n\n3,208\n39.95048\n-75.19324\n3,661"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-philadelphia-census-data-map-context",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#load-philadelphia-census-data-map-context",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Load Philadelphia Census Data + Map Context",
+    "text": "Load Philadelphia Census Data + Map Context"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#map-philadelphia-context",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#map-philadelphia-context",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Map Philadelphia Context",
+    "text": "Map Philadelphia Context\n\n# Map median income\nggplot() +\n  geom_sf(data = philly_census, aes(fill = Med_Inc), color = NA) +\n  scale_fill_viridis(\n    option = \"viridis\",\n    name = \"Median\\nIncome\",\n    labels = scales::dollar\n  ) +\n  labs(\n    title = \"Philadelphia Median Household Income by Census Tract\",\n    subtitle = \"Context for understanding bike share demand patterns\"\n  ) +\n  # Stations \n  geom_point(\n    data = indego,\n    aes(x = start_lon, y = start_lat),\n    color = \"red\", size = 0.25, alpha = 0.6\n  ) +\n  mapTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-census-data-to-stations-1",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-census-data-to-stations-1",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Join Census Data to Stations",
+    "text": "Join Census Data to Stations\nWe’ll spatially join census characteristics to each bike station.\n\n# Create sf object for stations\nstations_sf &lt;- indego %&gt;%\n  distinct(start_station, start_lat, start_lon) %&gt;%\n  filter(!is.na(start_lat), !is.na(start_lon)) %&gt;%\n  st_as_sf(coords = c(\"start_lon\", \"start_lat\"), crs = 4326)\n\n# Spatial join to get census tract for each station\nstations_census &lt;- st_join(stations_sf, philly_census, left = TRUE) %&gt;%\n  st_drop_geometry()\n\n# Look at the result - investigate whether all of the stations joined to census data\n\nstations_for_map &lt;- indego %&gt;%\n  distinct(start_station, start_lat, start_lon) %&gt;%\n  filter(!is.na(start_lat), !is.na(start_lon)) %&gt;%\n  left_join(\n    stations_census %&gt;% select(start_station, Med_Inc),\n    by = \"start_station\"\n  ) %&gt;%\n  mutate(has_census = !is.na(Med_Inc))\n\n# Add back to trip data\nindego_census &lt;- indego %&gt;%\n  left_join(\n    stations_census %&gt;% \n      select(start_station, Med_Inc, Percent_Taking_Transit, \n             Percent_White, Total_Pop),\n    by = \"start_station\"\n  )"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-weather-patterns",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-weather-patterns",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Visualize Weather Patterns",
+    "text": "Visualize Weather Patterns"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#aggregate-trips-to-station-hour-level",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#aggregate-trips-to-station-hour-level",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Aggregate Trips to Station-Hour Level",
+    "text": "Aggregate Trips to Station-Hour Level\n\n# Count trips by station-hour\ntrips_panel &lt;- indego_census %&gt;%\n  group_by(interval60, start_station, start_lat, start_lon,\n           Med_Inc, Percent_Taking_Transit, Percent_White, Total_Pop) %&gt;%\n  summarize(Trip_Count = n()) %&gt;%\n  ungroup()\n\n\n\n\nSummary of Panel Structure\n\n\nMetric\nValue\n\n\n\n\nTotal Station-Hour Observations\n175,936\n\n\nUnique Stations\n235\n\n\nUnique Hours\n2,184"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-complete-panel-structure",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#create-complete-panel-structure",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Create Complete Panel Structure",
+    "text": "Create Complete Panel Structure\nNot every station has trips every hour. We need a complete panel where every station-hour combination exists (even if Trip_Count = 0).\n\n# Calculate expected panel size\nn_stations &lt;- length(unique(trips_panel$start_station))\nn_hours &lt;- length(unique(trips_panel$interval60))\nexpected_rows &lt;- n_stations * n_hours\n\n\n\n\nCompleteness of Panel Structure\n\n\nMetric\nValue\n\n\n\n\nExpected panel rows\n513,240\n\n\nCurrent rows\n175,936\n\n\nMissing rows\n337,304\n\n\n\n\n\n\n# Create complete panel\nstudy_panel &lt;- expand.grid(\n  interval60 = unique(trips_panel$interval60),\n  start_station = unique(trips_panel$start_station)\n) %&gt;%\n  # Join trip counts\n  left_join(trips_panel, by = c(\"interval60\", \"start_station\")) %&gt;%\n  # Replace NA trip counts with 0\n  mutate(Trip_Count = replace_na(Trip_Count, 0))\n\n# Fill in station attributes (they're the same for all hours)\nstation_attributes &lt;- trips_panel %&gt;%\n  group_by(start_station) %&gt;%\n  summarize(\n    start_lat = first(start_lat),\n    start_lon = first(start_lon),\n    Med_Inc = first(Med_Inc),\n    Percent_Taking_Transit = first(Percent_Taking_Transit),\n    Percent_White = first(Percent_White),\n    Total_Pop = first(Total_Pop)\n  )\n\nstudy_panel &lt;- study_panel %&gt;%\n  left_join(station_attributes, by = \"start_station\")\n\n\n\n\nFinal Panel Size After Completion\n\n\nMetric\nValue\n\n\n\n\nComplete panel rows\n513,240"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#add-time-features",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#add-time-features",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Add Time Features",
+    "text": "Add Time Features\n\nstudy_panel &lt;- study_panel %&gt;%\n  mutate(\n    week = week(interval60),\n    month = month(interval60, label = TRUE),\n    dotw = wday(interval60, label = TRUE),\n    hour = hour(interval60),\n    date = as.Date(interval60),\n    weekend = ifelse(dotw %in% c(\"Sat\", \"Sun\"), 1, 0),\n    rush_hour = ifelse(hour %in% c(7, 8, 9, 16, 17, 18), 1, 0)\n  )"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-weather-data",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#join-weather-data",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Join Weather Data",
+    "text": "Join Weather Data\n\nstudy_panel &lt;- study_panel %&gt;%\n  left_join(weather_complete, by = \"interval60\")"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#why-lags",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#why-lags",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Why Lags?",
+    "text": "Why Lags?\nIf there were 15 bike trips from Station A at 8:00 AM, there will probably be ~15 trips at 9:00 AM. We can use this temporal persistence to improve predictions.\n\n# Sort by station and time\nstudy_panel &lt;- study_panel %&gt;%\n  arrange(start_station, interval60)\n\n# Create lag variables WITHIN each station\nstudy_panel &lt;- study_panel %&gt;%\n  group_by(start_station) %&gt;%\n  mutate(\n    lag1Hour = lag(Trip_Count, 1),\n    lag2Hours = lag(Trip_Count, 2),\n    lag3Hours = lag(Trip_Count, 3),\n    lag12Hours = lag(Trip_Count, 12),\n    lag1day = lag(Trip_Count, 24)\n  ) %&gt;%\n  ungroup()\n\n# Remove rows with NA lags (first 24 hours for each station)\nstudy_panel_complete &lt;- study_panel %&gt;%\n  filter(!is.na(lag1day))\n\nstudy_panel_complete &lt;- study_panel_complete %&gt;%\n  mutate(\n    month = factor(month, levels = c(\"Apr\", \"May\", \"Jun\")),\n    dotw  = factor(dotw,  levels = c(\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"))\n  )"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-lag-correlations",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-lag-correlations",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Visualize Lag Correlations",
+    "text": "Visualize Lag Correlations\n\n# Sample one station to visualize\nexample_station &lt;- study_panel_complete %&gt;%\n  filter(start_station == first(start_station)) %&gt;%\n  head(168)  # One week\n\n# Plot actual vs lagged demand\nggplot(example_station, aes(x = interval60)) +\n  geom_line(aes(y = Trip_Count, color = \"Current\"), linewidth = 1) +\n  geom_line(aes(y = lag1Hour, color = \"1 Hour Ago\"), linewidth = 1, alpha = 0.7) +\n  geom_line(aes(y = lag1day, color = \"24 Hours Ago\"), linewidth = 1, alpha = 0.7) +\n  scale_color_manual(values = c(\n    \"Current\" = \"#08519c\",\n    \"1 Hour Ago\" = \"#3182bd\",\n    \"24 Hours Ago\" = \"#6baed6\"\n  )) +\n  labs(\n    title = \"Temporal Lag Patterns at One Station\",\n    subtitle = \"Past demand predicts future demand\",\n    x = \"Date-Time\",\n    y = \"Trip Count\",\n    color = \"Time Period\"\n  ) +\n  plotTheme"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#why-temporal-validation-matters",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#why-temporal-validation-matters",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Why Temporal Validation Matters",
+    "text": "Why Temporal Validation Matters\nIn real operations, at 6:00 AM on March 15, we need to predict demand for March 15-31. We have data from Jan 1 - March 14, but NOT from March 15-31 (it hasn’t happened yet!).\nWrong approach: Train on weeks 10-13, test on weeks 1-9 (predicting past from future!)\nCorrect approach: Train on weeks 1-9, test on weeks 10-13 (predicting future from past)\n\n# Split by week for Q2 2024\n# Q2 has weeks 14–26 (April–June)\n# Train on weeks 14–21 (April–late May)\n# Test on weeks 22–26 (mostly June)\n\ntrain_weeks &lt;- 14:21\ntest_weeks  &lt;- 22:26\n\n# Stations active in BOTH early (train) and late (test) periods\nearly_stations &lt;- study_panel_complete %&gt;%\n  filter(week %in% train_weeks, Trip_Count &gt; 0) %&gt;%\n  distinct(start_station) %&gt;%\n  pull(start_station)\n\nlate_stations &lt;- study_panel_complete %&gt;%\n  filter(week %in% test_weeks, Trip_Count &gt; 0) %&gt;%\n  distinct(start_station) %&gt;%\n  pull(start_station)\n\ncommon_stations &lt;- intersect(early_stations, late_stations)\n\n# Keep only common stations\nstudy_panel_q2 &lt;- study_panel_complete %&gt;%\n  filter(start_station %in% common_stations)\n\n# Now create train/test split\ntrain &lt;- study_panel_q2 %&gt;%\n  filter(week %in% train_weeks)\n\ntest &lt;- study_panel_q2 %&gt;%\n  filter(week %in% test_weeks)"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-1-baseline-time-weather",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-1-baseline-time-weather",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 1: Baseline (Time + Weather)",
+    "text": "Model 1: Baseline (Time + Weather)\n\n# Create day of week factor with treatment (dummy) coding\ntrain &lt;- train %&gt;%\n  mutate(dotw_simple = factor(dotw, levels = c(\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\")))\n\n# Set contrasts to treatment coding (dummy variables)\ncontrasts(train$dotw_simple) &lt;- contr.treatment(7)\n\n# Now run the model\nmodel1 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple + Temperature + Precipitation,\n  data = train\n)\n\nThe model uses Monday as the baseline. Each coefficient represents the difference in expected trips per station-hour compared to Monday - dow_simple2 = Tuesday..\nWeekday Pattern (Tue-Fri):\n\nWeekday effects range from –0.063 to +0.016.\nNo weekday has a positive, strong increase, unlike your example.\nThursday is the only weekday above baseline.\nTuesday, Wednesday, and Friday are all slightly below Monday.\n\nWeekend Pattern (Sat-Sun):\n\nBoth weekend days show substantial drops relative to Monday.\nSunday has the largest negative effect (–0.112).\nThis indicates significantly lower station-hour activity on weekends.\n\nHourly Interpretation\nAcross the 24-hour day, activity is lowest between hours 1–4, where trips fall slightly below the midnight baseline (with coefficients between -0.078 and -0.096). Activity begins to rise at hour 5 (+0.033) and increases sharply through the morning commute, with strong positive effects at hours 6–9, including a substantial morning peak at hour 8 (+0.851) and sustained high demand at hour 9 (+0.637). Midday hours (10–14) maintain moderately elevated trip counts, ranging from +0.535 to +0.643. In the afternoon, demand climbs again, rising through hours 15–16 and reaching the highest level of the entire day at hour 17 (+1.161), indicating a very strong evening peak. Activity remains high at hour 18 (+0.917) before gradually declining across the evening hours 19–22 (from +0.672 down to +0.186). By hour 23, demand tapers to a modest +0.065—still slightly above the midnight baseline but representing the transition into late-night low activity.\nIsn’t this fun!"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-2-add-temporal-lags",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-2-add-temporal-lags",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 2: Add Temporal Lags",
+    "text": "Model 2: Add Temporal Lags\n\nmodel2 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple + Temperature + Precipitation +\n    lag1Hour + lag3Hours + lag1day,\n  data = train\n)\n\nThe inclusion of temporal lags substantially improved the model’s explanatory power, raising the adjusted R² from approximately 0.116 to 0.348, which reflects a nearly threefold increase in explained variation. This improvement occurs because bike-share demand is highly autocorrelated: stations that experience high or low usage in one hour tend to show similar patterns in the following hours, and usage at the same hour on the previous day is also strongly predictive. The lagged variables, particularly the one-hour lag and the three-hour and one-day lags, capture these short-term and daily cyclical patterns that the hour-of-day and day-of-week predictors alone can’t do. As a result, the model better reflects the underlying temporal structure of bike demand, leading to smaller residuals and a much stronger overall fit."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-3-add-demographics",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-3-add-demographics",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 3: Add Demographics",
+    "text": "Model 3: Add Demographics\n\nmodel3 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple + Temperature + Precipitation +\n    lag1Hour + lag3Hours + lag1day +\n    Med_Inc.x + Percent_Taking_Transit.y + Percent_White.y,\n  data = train\n)\n\nsummary(model3)\n\nThe addition of demographic variables did not improve model fit; in fact, the adjusted R² declined from about 0.348 in the temporal-lag model to roughly 0.237 after including median income, transit use, and racial composition. This reduction occurs primarily because adding demographics caused the loss of over 270,000 observations due to missing data, leaving the model trained on less than one-third of the original sample. With far fewer observations, the hour-to-hour temporal structure that drives trip volume becomes harder to estimate precisely, and the remaining sample may not fully represent the full behavioral patterns across the system. Although two demographic predictors, percent taking transit and percent white are statistically significant, their effect sizes are small relative to the strong temporal autocorrelation captured by the lagged variables. As a result, the demographic-augmented model explains less variance overall, not because demographics are irrelevant, but because the loss of data outweighs any modest predictive gains they could have contributed."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-4-add-station-fixed-effects",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-4-add-station-fixed-effects",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 4: Add Station Fixed Effects",
+    "text": "Model 4: Add Station Fixed Effects\n\nmodel4 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple + Temperature + Precipitation +\n    lag1Hour + lag3Hours + lag1day +\n    Med_Inc.x + Percent_Taking_Transit.y + Percent_White.y +\n    as.factor(start_station),\n  data = train\n)\n\n# Summary too long with all station dummies, just show key metrics\ncat(\"Model 4 R-squared:\", summary(model4)$r.squared, \"\\n\")\n\nModel 4 R-squared: 0.2650394 \n\ncat(\"Model 4 Adj R-squared:\", summary(model4)$adj.r.squared, \"\\n\")\n\nModel 4 Adj R-squared: 0.2635262 \n\n\nAdding station fixed effects allows the model to account for persistent, station-specific differences in baseline trip demand that are not explained by hourly patterns, day-of-week effects, weather, lags, or demographics. Some stations are inherently busier because they are located in dense commercial districts, near major transit hubs, or along popular commuting corridors, while others serve quieter residential or peripheral areas with consistently lower usage. By including a dummy variable for each station, the model absorbs these stable location-level characteristics, effectively letting every station have its own intercept and preventing unobserved spatial differences from biasing the other coefficients. Although this raises the R-squared relative to the demographics-only model, the improvement is moderate because fixed effects mainly redistribute variance across stations rather than improving the model’s ability to explain within station temporal fluctuations, which are still driven primarily by the lag terms and hourly patterns."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-5-add-rush-hour-interaction",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#model-5-add-rush-hour-interaction",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Model 5: Add Rush Hour Interaction",
+    "text": "Model 5: Add Rush Hour Interaction\n\ntrain$month &lt;- factor(train$month, levels = c(\"Apr\", \"May\", \"Jun\"))\ntest$month &lt;- factor(test$month, levels = levels(train$month))\n\nmodel5 &lt;- lm(\n  Trip_Count ~ as.factor(hour) + dotw_simple + Temperature + Precipitation +\n    lag1Hour + lag3Hours + lag1day + rush_hour + month +\n    Med_Inc.x + Percent_Taking_Transit.y + Percent_White.y +\n    as.factor(start_station) +\n    rush_hour * weekend,  # Rush hour effects different on weekends\n  data = train\n)\n\nModel 5 adds a rush_hour × weekend interaction to allow peak-period effects to differ between weekdays and weekends. This recognizes that weekday rush hours reflect strong commuting patterns, while weekend usage is more diffuse and less time-sensitive. By including this interaction, along with month fixed effects, the model captures important behavioral differences in how riders use the system across days and times, refining the temporal structure established in earlier models."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#calculate-predictions-and-mae",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#calculate-predictions-and-mae",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Calculate Predictions and MAE",
+    "text": "Calculate Predictions and MAE\n\n# Get predictions on test set\n\n# Make sure month in TEST has the same levels as train\ntest$month &lt;- factor(test$month, levels = model5$xlevels$month)\n\n# Create day of week factor with treatment (dummy) coding\ntest &lt;- test %&gt;%\n  mutate(dotw_simple = factor(dotw, levels = c(\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\")))\n\n# Set contrasts to treatment coding (dummy variables)\ncontrasts(test$dotw_simple) &lt;- contr.treatment(7)\n\ntest &lt;- test %&gt;%\n  mutate(\n    pred1 = predict(model1, newdata = test),\n    pred2 = predict(model2, newdata = test),\n    pred3 = predict(model3, newdata = test),\n    pred4 = predict(model4, newdata = test),\n    pred5 = predict(model5, newdata = test)\n  )\n\n# Calculate MAE for each model\nmae_results &lt;- data.frame(\n  Model = c(\n    \"1. Time + Weather\",\n    \"2. + Temporal Lags\",\n    \"3. + Demographics\",\n    \"4. + Station FE\",\n    \"5. + Rush Hour Interaction\"\n  ),\n  MAE = c(\n    mean(abs(test$Trip_Count - test$pred1), na.rm = TRUE),\n    mean(abs(test$Trip_Count - test$pred2), na.rm = TRUE),\n    mean(abs(test$Trip_Count - test$pred3), na.rm = TRUE),\n    mean(abs(test$Trip_Count - test$pred4), na.rm = TRUE),\n    mean(abs(test$Trip_Count - test$pred5), na.rm = TRUE)\n  )\n)\n\nkable(mae_results, \n      digits = 2,\n      caption = \"Mean Absolute Error by Model (Test Set)\",\n      col.names = c(\"Model\", \"MAE (trips)\")) %&gt;%\n  kable_styling(bootstrap_options = c(\"striped\", \"hover\"))\n\n\nMean Absolute Error by Model (Test Set)\n\n\nModel\nMAE (trips)\n\n\n\n\n1. Time + Weather\n0.86\n\n\n2. + Temporal Lags\n0.71\n\n\n3. + Demographics\n0.96\n\n\n4. + Station FE\n0.95\n\n\n5. + Rush Hour Interaction\n0.91"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-model-comparison",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#visualize-model-comparison",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Visualize Model Comparison",
+    "text": "Visualize Model Comparison\n\nggplot(mae_results, aes(x = reorder(Model, -MAE), y = MAE)) +\n  geom_col(fill = \"#3182bd\", alpha = 0.8) +\n  geom_text(aes(label = round(MAE, 2)), vjust = -0.5) +\n  labs(\n    title = \"Model Performance Comparison\",\n    subtitle = \"Lower MAE = Better Predictions\",\n    x = \"Model\",\n    y = \"Mean Absolute Error (trips)\"\n  ) +\n  plotTheme +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))\n\n\n\n\n\n\n\n\nQuestion: Which features gave us the biggest improvement?\nFor Q2 2024, the features that helped the most were the temporal lags (Model 2). When we added the 1-hour, 3-hour, and 24-hour lag variables, the MAE dropped the most, from 0.86 down to 0.71. This makes sense because bike demand tends to repeat patterns from the previous hour or the same hour yesterday."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#observed-vs.-predicted",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#observed-vs.-predicted",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Observed vs. Predicted",
+    "text": "Observed vs. Predicted\nLet’s use our best model (Model 2) for error analysis.\n\ntest &lt;- test %&gt;%\n  mutate(\n    error = Trip_Count - pred2,\n    abs_error = abs(error),\n    time_of_day = case_when(\n      hour &lt; 7 ~ \"Overnight\",\n      hour &gt;= 7 & hour &lt; 10 ~ \"AM Rush\",\n      hour &gt;= 10 & hour &lt; 15 ~ \"Mid-Day\",\n      hour &gt;= 15 & hour &lt;= 18 ~ \"PM Rush\",\n      hour &gt; 18 ~ \"Evening\"\n    )\n  )\n\n# Scatter plot by time and day type\nggplot(test, aes(x = Trip_Count, y = pred2)) +\n  geom_point(alpha = 0.2, color = \"#3182bd\") +\n  geom_abline(slope = 1, intercept = 0, color = \"red\", linewidth = 1) +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"darkgreen\") +\n  facet_grid(weekend ~ time_of_day) +\n  labs(\n    title = \"Observed vs. Predicted Bike Trips\",\n    subtitle = \"Model 2 performance by time period\",\n    x = \"Observed Trips\",\n    y = \"Predicted Trips\",\n    caption = \"Red line = perfect predictions; Green line = actual model fit\"\n  ) +\n  plotTheme\n\n\n\n\n\n\n\n\nQuestion: Where is the model performing well? Where is it struggling?\nThe model performs best during Mid-Day and Overnight hours, where points fall close to the 45° line and the green fitted line tracks the red perfect-prediction line more closely. It performs worst during AM Rush and PM Rush, especially on weekdays, where the model systematically under-predicts higher ridership and shows much wider scatter. Evening periods also show moderate under-prediction but less extreme than the rush hours."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#spatial-error-patterns",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#spatial-error-patterns",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Spatial Error Patterns",
+    "text": "Spatial Error Patterns\nAre prediction errors clustered in certain parts of Philadelphia?\n\n# Calculate MAE by station\nstation_errors &lt;- test %&gt;%\n  group_by(start_station, start_lat.x, start_lon.y) %&gt;%\n  summarize(\n    MAE = mean(abs_error, na.rm = TRUE),\n    avg_demand = mean(Trip_Count, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  filter(!is.na(start_lat.x), !is.na(start_lon.y))\n\n## Create Two Maps Side-by-Side with Proper Legends (sorry these maps are ugly)\n\n# Calculate station errors\nstation_errors &lt;- test %&gt;%\n  filter(!is.na(pred2)) %&gt;%\n  group_by(start_station, start_lat.x, start_lon.y) %&gt;%\n  summarize(\n    MAE = mean(abs(Trip_Count - pred2), na.rm = TRUE),\n    avg_demand = mean(Trip_Count, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  filter(!is.na(start_lat.x), !is.na(start_lon.y))\n\n# Map 1: Prediction Errors\np1 &lt;- ggplot() +\n  geom_sf(data = philly_census, fill = \"grey95\", color = \"white\", size = 0.2) +\n  geom_point(\n    data = station_errors,\n    aes(x = start_lon, y = start_lat, color = MAE),\n    size = 3.5,\n    alpha = 0.7\n  ) +\n  scale_color_viridis(\n    option = \"plasma\",\n    name = \"MAE\\n(trips)\",\n    direction = -1,\n    breaks = c(0.5, 1.0, 1.5),  # Fewer, cleaner breaks\n    labels = c(\"0.5\", \"1.0\", \"1.5\")\n  ) +\n  labs(title = \"Prediction Errors\",\n       subtitle = \"Higher in Center City\") +\n  mapTheme +\n  theme(\n    legend.position = \"right\",\n    legend.title = element_text(size = 10, face = \"bold\"),\n    legend.text = element_text(size = 9),\n    plot.title = element_text(size = 14, face = \"bold\"),\n    plot.subtitle = element_text(size = 10)\n  ) +\n  guides(color = guide_colorbar(\n    barwidth = 1.5,\n    barheight = 12,\n    title.position = \"top\",\n    title.hjust = 0.5\n  ))\n\n# Map 2: Average Demand\np2 &lt;- ggplot() +\n  geom_sf(data = philly_census, fill = \"grey95\", color = \"white\", size = 0.2) +\n  geom_point(\n    data = station_errors,\n    aes(x = start_lon.y, y = start_lat.x, color = avg_demand),\n    size = 3.5,\n    alpha = 0.7\n  ) +\n  scale_color_viridis(\n    option = \"viridis\",\n    name = \"Avg\\nDemand\",\n    direction = -1,\n    breaks = c(0.5, 1.0, 1.5, 2.0, 2.5),  # Clear breaks\n    labels = c(\"0.5\", \"1.0\", \"1.5\", \"2.0\", \"2.5\")\n  ) +\n  labs(title = \"Average Demand\",\n       subtitle = \"Trips per station-hour\") +\n  mapTheme +\n  theme(\n    legend.position = \"right\",\n    legend.title = element_text(size = 10, face = \"bold\"),\n    legend.text = element_text(size = 9),\n    plot.title = element_text(size = 14, face = \"bold\"),\n    plot.subtitle = element_text(size = 10)\n  ) +\n  guides(color = guide_colorbar(\n    barwidth = 1.5,\n    barheight = 12,\n    title.position = \"top\",\n    title.hjust = 0.5\n  ))\n\n# Map 1: Prediction Errors\np1 &lt;- ggplot() +\n  geom_sf(data = philly_census, fill = \"grey95\", color = \"white\", size = 0.1) +\n  geom_point(\n    data = station_errors,\n    aes(x = start_lon.y, y = start_lat.x, color = MAE),\n    size = 3.5,\n    alpha = 0.7\n  ) +\n  scale_color_viridis(\n    option = \"plasma\",\n    name = \"MAE (trips)\",\n    direction = -1,\n    breaks = c(0.5, 1.0, 1.5),\n    labels = c(\"0.5\", \"1.0\", \"1.5\")\n  ) +\n  labs(title = \"Prediction Errors\") +\n  mapTheme +\n  theme(\n    legend.position = \"bottom\",\n    legend.title = element_text(size = 10, face = \"bold\"),\n    legend.text = element_text(size = 9),\n    plot.title = element_text(size = 14, face = \"bold\", hjust = 0.5)\n  ) +\n  guides(color = guide_colorbar(\n    barwidth = 12,\n    barheight = 1,\n    title.position = \"top\",\n    title.hjust = 0.5\n  ))\n\n# Map 2: Average Demand  \np2 &lt;- ggplot() +\n  geom_sf(data = philly_census, fill = \"grey95\", color = \"white\", size = 0.1) +\n  geom_point(\n    data = station_errors,\n    aes(x = start_lon.y, y = start_lat.x, color = avg_demand),\n    size = 3.5,\n    alpha = 0.7\n  ) +\n  scale_color_viridis(\n    option = \"viridis\",\n    name = \"Avg Demand (trips/hour)\",\n    direction = -1,\n    breaks = c(0.5, 1.0, 1.5, 2.0, 2.5),\n    labels = c(\"0.5\", \"1.0\", \"1.5\", \"2.0\", \"2.5\")\n  ) +\n  labs(title = \"Average Demand\") +\n  mapTheme +\n  theme(\n    legend.position = \"bottom\",\n    legend.title = element_text(size = 10, face = \"bold\"),\n    legend.text = element_text(size = 9),\n    plot.title = element_text(size = 14, face = \"bold\", hjust = 0.5)\n  ) +\n  guides(color = guide_colorbar(\n    barwidth = 12,\n    barheight = 1,\n    title.position = \"top\",\n    title.hjust = 0.5\n  ))\n\n# Combine\ngrid.arrange(\n  p1, p2,\n  ncol = 2\n  )\n\n\n\n\n\n\n\n\nQuestion: Do you see spatial clustering of errors? What neighborhoods have high errors?\nYes, there is a clear spatial clustering of errors. The highest prediction errors occur in and around Center City and University City, where demand is also highest. Outlying neighborhoods such as South Philly, West Parkside, and Northeast Philly show lower errors because demand is lower and more stable."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-error-patterns",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-error-patterns",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Temporal Error Patterns",
+    "text": "Temporal Error Patterns\nWhen are we most wrong?\n\n# MAE by time of day and day type\ntemporal_errors &lt;- test %&gt;%\n  group_by(time_of_day, weekend) %&gt;%\n  summarize(\n    MAE = mean(abs_error, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  mutate(day_type = ifelse(weekend == 1, \"Weekend\", \"Weekday\"))\n\nggplot(temporal_errors, aes(x = time_of_day, y = MAE, fill = day_type)) +\n  geom_col(position = \"dodge\") +\n  scale_fill_manual(values = c(\"Weekday\" = \"#08519c\", \"Weekend\" = \"#6baed6\")) +\n  labs(\n    title = \"Prediction Errors by Time Period\",\n    subtitle = \"When is the model struggling most?\",\n    x = \"Time of Day\",\n    y = \"Mean Absolute Error (trips)\",\n    fill = \"Day Type\"\n  ) +\n  plotTheme +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))\n\n\n\n\n\n\n\n\nThe model performs best during the overnight and evening hours, when demand is low and stable. Errors increase during the middle of the day and are highest during the AM and PM rush periods, especially the PM commute. This makes sense because rush-hour ridership is far more volatile and sensitive to small changes in weather, work schedules, and travel patterns."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#errors-and-demographics",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#errors-and-demographics",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Errors and Demographics",
+    "text": "Errors and Demographics\nAre prediction errors related to neighborhood characteristics?\n\n# Join demographic data to station errors\nstation_errors_demo &lt;- station_errors %&gt;%\n  left_join(\n    station_attributes %&gt;% select(start_station, Med_Inc, Percent_Taking_Transit, Percent_White),\n    by = \"start_station\"\n  ) %&gt;%\n  filter(!is.na(Med_Inc))\n\n# Create plots\np1 &lt;- ggplot(station_errors_demo, aes(x = Med_Inc, y = MAE)) +\n  geom_point(alpha = 0.5, color = \"#3182bd\") +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\") +\n  scale_x_continuous(labels = scales::dollar) +\n  labs(title = \"Errors vs. Median Income\", x = \"Median Income\", y = \"MAE\") +\n  plotTheme\n\np2 &lt;- ggplot(station_errors_demo, aes(x = Percent_Taking_Transit, y = MAE)) +\n  geom_point(alpha = 0.5, color = \"#3182bd\") +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\") +\n  labs(title = \"Errors vs. Transit Usage\", x = \"% Taking Transit\", y = \"MAE\") +\n  plotTheme\n\np3 &lt;- ggplot(station_errors_demo, aes(x = Percent_White, y = MAE)) +\n  geom_point(alpha = 0.5, color = \"#3182bd\") +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\") +\n  labs(title = \"Errors vs. Race\", x = \"% White\", y = \"MAE\") +\n  plotTheme\n\ngrid.arrange(p1, p2, p3, ncol = 2)\n\n\n\n\n\n\n\n\nCritical Question: Are prediction errors systematically higher in certain demographic groups? What are the equity implications?\nAcross Philadelphia, prediction errors show meaningful relationships with neighborhood demographics. Errors tend to be slightly higher in stations located in higher-income or higher-percentage-White areas, suggesting the model struggles more in wealthier, less transit-dependent neighborhoods where trip patterns may be more irregular. In contrast, stations in areas with higher transit use show lower errors, likely because these neighborhoods have more stable, predictable travel demand. These patterns raise equity considerations: if models systematically underperform in certain demographic groups, operational decisions (like rebalancing) could unintentionally favor or disadvantage specific communities."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#compare-mae-across-quarters",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#compare-mae-across-quarters",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Compare MAE Across Quarters",
+    "text": "Compare MAE Across Quarters\n\nmae_results_q2 &lt;- mae_results %&gt;%\n  mutate(Quarter = \"Q2 2024\")\n\nmae_results_q1_labeled &lt;- mae_results_q1 %&gt;%\n  mutate(Quarter = \"Q1 2025\")\n\nmae_compare &lt;- bind_rows(mae_results_q2, mae_results_q1_labeled)\n\nkable(mae_compare,\n      digits = 2,\n      caption = \"Model MAE Comparison: Q1 2025 vs Q2 2024\",\n      col.names = c(\"Model\", \"MAE (trips)\", \"Quarter\")) %&gt;%\n  kable_styling(bootstrap_options = c(\"striped\",\"hover\"))\n\n\nModel MAE Comparison: Q1 2025 vs Q2 2024\n\n\nModel\nMAE (trips)\nQuarter\n\n\n\n\n1. Time + Weather\n0.86\nQ2 2024\n\n\n2. + Temporal Lags\n0.71\nQ2 2024\n\n\n3. + Demographics\n0.96\nQ2 2024\n\n\n4. + Station FE\n0.95\nQ2 2024\n\n\n5. + Rush Hour Interaction\n0.91\nQ2 2024\n\n\n1. Time + Weather\n0.60\nQ1 2025\n\n\n2. + Temporal Lags\n0.50\nQ1 2025\n\n\n3. + Demographics\n0.74\nQ1 2025\n\n\n4. + Station FE\n0.73\nQ1 2025\n\n\n5. + Rush Hour Interaction\n0.73\nQ1 2025"
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#mae-comparison-plot",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#mae-comparison-plot",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "MAE Comparison Plot",
+    "text": "MAE Comparison Plot\n\nggplot(mae_compare,\n       aes(x = Model, y = MAE, fill = Quarter)) +\n  geom_col(position = \"dodge\") +\n  geom_text(aes(label = round(MAE, 2)),\n            position = position_dodge(width = 0.9),\n            vjust = -0.4, size = 3) +\n  labs(\n    title = \"Model Performance Across Quarters\",\n    y     = \"Mean Absolute Error (trips)\",\n    x     = \"Model\"\n  ) +\n  plotTheme +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))\n\n\n\n\n\n\n\n\nModels consistently perform better in Q1 2025 than in Q2 2024, with lower MAE across every specification. Winter travel is more predictable because most trips are work-related and follow a routine. In Q2 2024, ridership is higher and more random due to nicer weather, outdoor activities, and tourism, which makes predictions harder. This is why every model has lower MAE in Q1 than Q2."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-error-comparison-q1-vs-q2",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#temporal-error-comparison-q1-vs-q2",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Temporal Error Comparison: Q1 vs Q2",
+    "text": "Temporal Error Comparison: Q1 vs Q2\n\n#Q1 2025 TEMPORAL ERRORS\ntemporal_errors_q1 &lt;- test_q1 %&gt;%\n  group_by(time_of_day_q1, weekend) %&gt;%\n  summarize(\n    MAE = mean(abs_error_q1, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  mutate(\n    Day_Type = ifelse(weekend == 1, \"Weekend\", \"Weekday\"),\n    Quarter = \"Q1 2025\",\n    Time_of_Day = time_of_day_q1\n  ) %&gt;%\n  select(Time_of_Day, MAE, Day_Type, Quarter)\n\n\n#Q2 2024 TEMPORAL ERRORS\ntemporal_errors_q2 &lt;- test %&gt;%        # your Q2 dataset\n  group_by(time_of_day, weekend) %&gt;%\n  summarize(\n    MAE = mean(abs_error, na.rm = TRUE),\n    .groups = \"drop\"\n  ) %&gt;%\n  mutate(\n    Day_Type = ifelse(weekend == 1, \"Weekend\", \"Weekday\"),\n    Quarter = \"Q2 2024\",\n    Time_of_Day = time_of_day\n  ) %&gt;%\n  select(Time_of_Day, MAE, Day_Type, Quarter)\n\n\n#COMBINE\ntemporal_compare &lt;- bind_rows(temporal_errors_q1, temporal_errors_q2)\n\n\n#PLOT\nggplot(temporal_compare,\n       aes(x = Time_of_Day, y = MAE, fill = Day_Type)) +\n  geom_col(position = \"dodge\") +\n  facet_wrap(~ Quarter, ncol = 2) +\n  labs(\n    title = \"Prediction Errors by Time of Day and Quarter\",\n    y = \"Mean Absolute Error (trips)\",\n    x = \"Time of Day\",\n    fill = \"Day Type\"\n  ) +\n  plotTheme +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))\n\n\n\n\n\n\n\n\nQ1 and Q2 have different error patterns. In Q1 2025, errors spike during morning and evening rush hours, when travel is busiest and most unpredictable. Overnight and evening hours are easiest to predict. In Q2 2024, errors are more evenly spread throughout the day because people ride more for leisure, not just commuting. Seasonal differences, like winter vs. spring, explain most of the pattern."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#feature-importance-comparison",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#feature-importance-comparison",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Feature Importance Comparison",
+    "text": "Feature Importance Comparison\n\nget_coef_table &lt;- function(model, quarter_label) {\n  sm &lt;- summary(model)$coefficients\n  tibble(\n    Variable  = rownames(sm),\n    Estimate  = sm[, 1]\n  ) %&gt;%\n    mutate(\n      Quarter  = quarter_label,\n      Abs_Est  = abs(Estimate)\n    )\n}\n\ncoefs_q2 &lt;- get_coef_table(model2,   \"Q2 2024\")\ncoefs_q1 &lt;- get_coef_table(model2_q1,\"Q1 2025\")\n\nvars_focus &lt;- c(\"Temperature\", \"Precipitation\",\n                \"lag1Hour\", \"lag3Hours\", \"lag1day\")\n\nfeature_compare &lt;- bind_rows(coefs_q2, coefs_q1) %&gt;%\n  filter(Variable %in% vars_focus) %&gt;%\n  arrange(Quarter, desc(Abs_Est))\n\nkable(feature_compare,\n      digits = 3,\n      caption = \"Key Coefficient Magnitudes in Model 2 by Quarter\") %&gt;%\n  kable_styling(bootstrap_options = c(\"striped\",\"hover\"))\n\n\nKey Coefficient Magnitudes in Model 2 by Quarter\n\n\nVariable\nEstimate\nQuarter\nAbs_Est\n\n\n\n\nPrecipitation\n-1.385\nQ1 2025\n1.385\n\n\nlag1Hour\n0.325\nQ1 2025\n0.325\n\n\nlag1day\n0.166\nQ1 2025\n0.166\n\n\nlag3Hours\n0.098\nQ1 2025\n0.098\n\n\nTemperature\n0.003\nQ1 2025\n0.003\n\n\nPrecipitation\n-0.742\nQ2 2024\n0.742\n\n\nlag1Hour\n0.411\nQ2 2024\n0.411\n\n\nlag1day\n0.122\nQ2 2024\n0.122\n\n\nlag3Hours\n0.119\nQ2 2024\n0.119\n\n\nTemperature\n0.004\nQ2 2024\n0.004\n\n\n\n\n\nDifferent features matter in each quarter. In Q1 2025, precipitation is the strongest predictor because winter weather sharply affects ridership. Temporal lags also matter because demand is more consistent hour to hour. In Q2 2024, lag effects are still important, but weather has a smaller impact, and trips follow more flexible patterns. Overall, winter demand depends more on weather, while spring demand depends more on regular daily patterns."
+  },
+  {
+    "objectID": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#part-4-critical-reflection",
+    "href": "Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.html#part-4-critical-reflection",
+    "title": "Space-Time Prediction of Bike Share Demand: Philadelphia Indego",
+    "section": "Part 4: Critical Reflection",
+    "text": "Part 4: Critical Reflection\n\nOperational implications: Even though my improved model has a fairly low MAE, it still isn’t perfect, and Indego would need to be careful about relying on it. Most of the time, an MAE under 1 trip is “good enough” to guide rebalancing decisions, but errors during rush hour or at busy downtown stations can still cause real problems. A station emptying out 2–3 bikes earlier than expected can affect commuters pretty quickly. So I would recommend using this model as a supportive tool rather than something that fully automates rebalancing. It works best for planning ahead and spotting likely hotspots, but staff should still monitor real-time conditions, weather, and special events.\nEquity considerations: My error analysis showed that prediction accuracy wasn’t equal across all neighborhoods. Some areas, like Center City and higher-income stations had larger error, which means the model could unintentionally over or under serve certain parts of the city. If Indego relied on these predictions without oversight, it could reinforce existing inequalities in bike access by sending more rebalancing resources to already advantaged areas.\nModel limitations: The model doesn’t account for special events, tourism spikes, construction, transit delays, or sudden weather changes, all of which can dramatically change bike demand. It also assumes past patterns repeat in the same way every week, which isn’t always true. If I could add more features, I would add real-time weather forecasts, event calendars, and bike lane accessibility."
   }
 ]

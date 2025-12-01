@@ -28,6 +28,8 @@ website:
             text: Midterm Presentation
           - href: Labs/Lab3/Script/Lab3_new.qmd
             text: Lab 3
+          - href: Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.qmd 
+            text: Lab 5
             
           
 format:

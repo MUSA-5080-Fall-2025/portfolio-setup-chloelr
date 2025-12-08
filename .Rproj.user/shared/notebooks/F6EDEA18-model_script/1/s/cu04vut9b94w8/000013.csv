@@ -1,4 +1,0 @@
-"0",""
-"0","price_by_nhood %>%"
-"0","  arrange(desc(median_price)) %>%"
-"0","  print(n = 50)"

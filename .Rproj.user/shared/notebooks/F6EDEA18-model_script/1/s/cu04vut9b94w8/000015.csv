@@ -1,4 +1,0 @@
-"0",""
-"0","price_by_nhood %>%"
-"0","  arrange(desc(n_sales)) %>%"
-"0","  head(5)"

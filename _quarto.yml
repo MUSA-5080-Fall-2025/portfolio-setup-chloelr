@@ -31,9 +31,9 @@ website:
           - href: Labs/Lab 5/Script/Indego_Space_Time_Predictions_Assignment.qmd 
             text: Lab 5
           - href: Labs/Final/MUSA-5080-final-script.qmd
-            text: Final Technical Appendix
-          - href: Labs/Midterm/MUSA-5080-final-presentatioin.qmd
-            text: Final Presentation
+            text: "Final Technical Appendix"
+          - href: Labs/Final/MUSA-5080-final-presentation.qmd
+            text: "Final Presentation"
             
           
 format:
